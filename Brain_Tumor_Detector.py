@@ -16,6 +16,7 @@ from sklearn.model_selection import train_test_split
 from keras import models
 from keras import layers
 from keras.utils import to_categorical
+import streamlit as st
 
 #Enables image plotting
 matplotlib.rcParams['interactive'] == True
@@ -72,6 +73,33 @@ def createData(yesDirectory, noDirectory, allDirectory):
     #Return train and test images as well as the train and test labels
     return train_images, test_images, train_labels, test_labels
 
+def display_images_with_predictions(model, images, labels, title):
+    predictions = model.predict(images)
+    fig, axes = plt.subplots(3, 5, figsize=(12, 8))
+    fig.suptitle(title, fontsize=16)
+    for i, ax in enumerate(axes.flat):
+        ax.imshow(images[i, :, :, 0], cmap='gray')
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        xContent = ""
+        if predictions[i, 0] > predictions[i, 1]:
+            xContent = "No Tumor"
+        else:
+            xContent = "Tumor"
+        if labels[i, 0] == 1:
+            ax.set_title("Label: No Tumor")
+            if xContent == 'No Tumor':
+                ax.set_xlabel(xContent, color='green')
+            else:
+                ax.set_xlabel(xContent, color='red')
+        else:
+            ax.set_title("Label: Tumor")
+            if xContent == 'Tumor':
+                ax.set_xlabel(xContent, color='green')
+            else:
+                ax.set_xlabel(xContent, color='red')
+    return fig
 
 # =============================================================================
 # Call createData method to create test and train images and labels.
@@ -126,6 +154,7 @@ print()
 print()
 print('test_acc:', test_acc)
 
+st.pyplot(display_images_with_predictions(model, test_images, test_labels, "Test Images and Predictions"))
 
 plt.plot(history.history['accuracy'])
 plt.plot(history.history['val_accuracy'])
@@ -134,7 +163,6 @@ plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['train', 'validation',], loc='upper right')
 plt.show()
-
 
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
