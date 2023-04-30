@@ -2,5 +2,5 @@ tensorflow
 keras
 matplotlib
 scikit-learn
-PIL
+Pillow
 numpy
